@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaderboard</title>
+    <style>
+        body { color: white; font-family: Arial; text-align: center; background-color:rgb(6, 14, 56); }
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            width: 60%;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #DDD;
+        }
+        .highlight {
+            animation: fadeOut 2s ease forwards;
+        }
+        @keyframes fadeOut {
+            0% { background-color: rgb(151, 142, 254); }
+            100% { background-color: transparent; }
+        }
+        form {
+            margin: 10px;
+        }
+
+        td a {
+            text-decoration: none;
+            color: white;
+        }
+        td a:hover {color: rgb(255, 34, 34);}
+    </style>
+</head>
+
+<script>
+    const searchName = "{{ search }}".toLowerCase();
+
+    if (searchName) {
+        const target = document.getElementById("player-" + searchName);
+
+        if (target) {
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }
+    }
+</script>
+
+<body>
+
+<h1>🏆 Leaderboard</h1>
+
+<!-- SEARCH -->
+<form method="GET">
+    <input type="text" name="search" placeholder="Search player">
+    <button type="submit">Search</button>
+</form>
+
+{% if message %}
+    <p>{{ message }}</p>
+{% endif %}
+
+<!-- ADD -->
+<form action="/add" method="POST">
+    <input type="text" name="name" placeholder="Name" required>
+    <input type="number" name="score" placeholder="Score" required>
+    <input type="number" name="wins" placeholder="Wins" required>
+    <input type="number" name="losses" placeholder="Losses" required>
+    <button>Add Player</button>
+</form>
+
+<!-- EDIT -->
+<form action="/edit" method="POST">
+    <input type="text" name="old_name" placeholder="Current Name" required>
+    <input type="text" name="new_name" placeholder="New Name" >
+    <input type="number" name="score" placeholder="Score" >
+    <input type="number" name="wins" placeholder="Wins" >
+    <input type="number" name="losses" placeholder="Losses" >
+    <button>Edit Player</button>
+</form>
+
+<form method="get">
+    <button type="submit" name="sort" value="score">Sort by Score</button>
+    <button type="submit" name="sort" value="wins">Sort by Wins</button>
+    <button type="submit" name="sort" value="losses">Sort by Losses</button>
+    <button type="submit" name="sort" value="games">Sort by Games Played</button>
+</form>
+
+<table>
+    <tr>
+        <th>Rank</th>
+        <th>Name</th>
+        <th>Score</th>
+        <th>Wins</th>
+        <th>Losses</th>
+        <th>Games Played</th>
+        <th></th>
+    </tr>
+
+    {% for p in players %}
+    <tr class="{% if search and p.name.lower() == search.lower() %}highlight{% endif %}">
+        <td>{{ loop.index }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.score }}</td>
+        <td>{{ p.wins }}</td>
+        <td>{{ p.losses }}</td>
+        <td>{{ p.wins + p.losses }}</td>
+        <td><a href="/delete/{{ p.name }}">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
